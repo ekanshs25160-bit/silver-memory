@@ -121,3 +121,8 @@ dist
 
 # Mac OS files
 .DS_Store
+
+# AI Learning Toolkit
+Manware-s-AI-Learning-Toolkit/
+.agents/
+learning/

@@ -3,6 +3,9 @@ import { ApiError } from "../utils/api-error";
 import { ApiResponse } from "../utils/api-response";
 import { asyncHandler } from "../utils/asyncHandler";
 import mongoose from "mongoose";
+import { User } from "../models/user.model";
+import { AvailableUser } from "../utils/constants";
+import { ProjectMember } from "../models/projectmember.model";
 
 export const createProject = asyncHandler(async (req, res) => {
   const { name, description } = req.body;
@@ -14,7 +17,7 @@ export const createProject = asyncHandler(async (req, res) => {
     description: description,
   });
   return res
-    .status(200)
+    .status(201)
     .json(new ApiResponse(201, project, "Project created Sucessfully"));
 });
 
@@ -81,4 +84,18 @@ export const deleteProject = asyncHandler(async(req,res)=>{
 
   return res.status(200).json(new ApiResponse(200, project, "Project deleted Successfully"))
 
+})
+
+export const addMembersToProject = asyncHandler(async(req,res)=>{
+    const {email,role} = req.body
+    const {projectId} = req.params
+    const user = await User.findOne({email})
+
+    if(!user){
+        throw new ApiError(404, "User not found")
+    }
+
+    await ProjectMember.findByIdAndUpdate({
+        user:
+    })
 })

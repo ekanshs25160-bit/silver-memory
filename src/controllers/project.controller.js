@@ -15,8 +15,15 @@ export const createProject = asyncHandler(async (req, res) => {
   const project = await Project.create({
     name: name,
     description: description,
-    owner,
+    owner: req.user._id,
   });
+
+  await ProjectMember.create({
+    project: project._id,
+    user: req.user._id,
+    role: "admin",
+  });
+
   return res
     .status(201)
     .json(new ApiResponse(201, project, "Project created Sucessfully"));
@@ -121,11 +128,11 @@ export const addMembersToProject = asyncHandler(async (req, res) => {
 
 export const getProjectMembers = asyncHandler(async (req, res) => {
   const { projectId } = req.params;
-  
+
   if (!mongoose.Types.ObjectId.isValid(projectId)) {
     throw new ApiError(400, "Invalid Project ID format");
   }
-  
+
   const project = await Project.findById(projectId);
   if (!project) {
     throw new ApiError(404, "Project not found");
@@ -142,5 +149,46 @@ export const getProjectMembers = asyncHandler(async (req, res) => {
       new ApiResponse(200, members, "Project members fetched successfully"),
     );
 });
-export const updateMemberRole = asyncHandler(async (req, res) => res.json({}));
-export const deleteMember = asyncHandler(async (req, res) => res.json({}));
+
+export const updateMemberRole = asyncHandler(async (req, res) => {
+  const { projectId, userId } = req.params;
+  const { role } = req.body;
+
+  const member = await ProjectMember.findOneAndUpdate(
+    { project: projectId, user: userId },
+    { role: role },
+    { new: true },
+  );
+
+  if (!member) {
+    throw new ApiError(404, "Member not found in this project");
+  }
+
+  if (!AvailableUser.includes(role)) {
+    throw new ApiError(
+      400,
+      `Invalid role. Allowed role: ${AvailableUser.join(",")}`,
+    );
+  }
+
+  return res
+    .status(200)
+    .json(new ApiResponse(200, member, "Member updated successfully"));
+});
+
+export const deleteMember = asyncHandler(async (req, res) => {
+  const { projectId, userId } = req.params;
+
+  const member = await ProjectMember.findOneAndDelete({
+    project: projectId,
+    user: userId,
+  });
+
+  if (!member) {
+    throw new ApiError(404, "Member not found in this project");
+  }
+
+  return res
+    .status(200)
+    .json(new ApiResponse(200, member, "Member deleted successfully"));
+});

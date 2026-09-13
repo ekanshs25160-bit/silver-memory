@@ -2,6 +2,9 @@ import express from 'express'
 import cors from 'cors'
 import { healthCheck } from './controllers/healthCheck.controllers.js'
 import projectRouter from './routes/project.routes.js'
+import authRouter from './routes/auth.routes.js'
+
+
 const app = express()
 
 app.use(express.json())
@@ -9,6 +12,7 @@ app.use(express.urlencoded({extended: true}))
 app.use(express.static("public"))
 app.use('/api/v1/healthCheck', healthCheck)
 app.use('/api/v1/projects', projectRouter)
+app.use('/api/v1/auth',authRouter)
 
 app.use(cors({
     origin: process.env.CORS_ORIGIN?.split(',') || "https://localhost:5173",

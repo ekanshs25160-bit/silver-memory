@@ -164,13 +164,6 @@ export const updateMemberRole = asyncHandler(async (req, res) => {
     throw new ApiError(404, "Member not found in this project");
   }
 
-  if (!AvailableUser.includes(role)) {
-    throw new ApiError(
-      400,
-      `Invalid role. Allowed role: ${AvailableUser.join(",")}`,
-    );
-  }
-
   return res
     .status(200)
     .json(new ApiResponse(200, member, "Member updated successfully"));

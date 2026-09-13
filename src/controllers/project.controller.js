@@ -154,6 +154,13 @@ export const updateMemberRole = asyncHandler(async (req, res) => {
   const { projectId, userId } = req.params;
   const { role } = req.body;
 
+  if (!AvailableUser.includes(role)) {
+    throw new ApiError(
+      400,
+      `Invalid role. Allowed role: ${AvailableUser.join(",")}`,
+    );
+  }
+
   const member = await ProjectMember.findOneAndUpdate(
     { project: projectId, user: userId },
     { role: role },

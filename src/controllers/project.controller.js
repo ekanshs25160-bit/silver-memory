@@ -15,6 +15,7 @@ export const createProject = asyncHandler(async (req, res) => {
   const project = await Project.create({
     name: name,
     description: description,
+    owner,
   });
   return res
     .status(201)
@@ -118,6 +119,28 @@ export const addMembersToProject = asyncHandler(async (req, res) => {
     .json(new ApiResponse(201, {}, "Project Member added successfully"));
 });
 
-export const getProjectMembers = asyncHandler(async (req, res) => res.json({}));
+export const getProjectMembers = asyncHandler(async (req, res) => {
+  const { projectId } = req.params;
+  
+  if (!mongoose.Types.ObjectId.isValid(projectId)) {
+    throw new ApiError(400, "Invalid Project ID format");
+  }
+  
+  const project = await Project.findById(projectId);
+  if (!project) {
+    throw new ApiError(404, "Project not found");
+  }
+
+  const members = await ProjectMember.find({ project: projectId }).populate(
+    "user",
+    "name email username",
+  );
+
+  return res
+    .status(200)
+    .json(
+      new ApiResponse(200, members, "Project members fetched successfully"),
+    );
+});
 export const updateMemberRole = asyncHandler(async (req, res) => res.json({}));
 export const deleteMember = asyncHandler(async (req, res) => res.json({}));

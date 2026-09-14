@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { verifyJWT } from "../middlewares/auth.middleware.js";
+import { verifyJWT,verifyUserRole } from "../middlewares/auth.middleware.js";
 import {
   createProject,
   getProjects,
@@ -11,6 +11,8 @@ import {
   updateMemberRole,
   deleteMember,
 } from "../controllers/project.controller.js";
+import { AvailableUser, UserRoleEnum } from "../utils/constants.js";
+import { User } from "../models/user.model.js";
 
 const router = Router();
 
@@ -20,18 +22,16 @@ router.route("/").post(createProject).get(getProjects);
 
 router
   .route("/:projectId")
-  .get(getProjectById)
-  .put(updateProject)
-  .delete(deleteProject);
+  .get(verifyUserRole(AvailableUser),getProjectById)
+  .put(verifyUserRole([UserRoleEnum.ADMIN]),updateProject)
+  .delete(verifyUserRole([UserRoleEnum.ADMIN]),deleteProject);
 
 router
   .route("/:projectId/members")
-  .get(getProjectMembers)
-  .post(addMembersToProject);
-
+  .get(verifyUserRole(AvailableUser),getProjectMembers)
+  .post(verifyUserRole([UserRoleEnum.ADMIN]), addMembersToProject);
 router
   .route("/:projectId/members/:userId")
-  .put(updateMemberRole)
-  .delete(deleteMember);
-
+  .put(verifyUserRole([UserRoleEnum.ADMIN]), updateMemberRole)
+  .delete(verifyUserRole([UserRoleEnum.ADMIN]), deleteMember);
 export default router;

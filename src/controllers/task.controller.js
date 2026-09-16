@@ -1,9 +1,9 @@
 import mongoose from "mongoose";
-import { asyncHandler } from "../utils/asyncHandler";
-import { Task } from "../models/task.model";
-import { TaskStatusEnum } from "../utils/constants";
-import { ApiError } from "../utils/api-error";
-import { ApiResponse } from "../utils/api-response";
+import { asyncHandler } from "../utils/asyncHandler.js";
+import { Task } from "../models/task.model.js";
+import { TaskStatusEnum } from "../utils/constants.js";
+import { ApiError } from "../utils/api-error.js";
+import { ApiResponse } from "../utils/api-response.js";
 
 export const createTask = asyncHandler(async(req,res)=>{
     const {title,description,assignedTo,status} = req.body

@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { Task } from "../models/task.model.js";
-import { TaskStatusEnum } from "../utils/constants.js";
+import { AvailableTaskStatus, TaskStatusEnum } from "../utils/constants.js";
 import { ApiError } from "../utils/api-error.js";
 import { ApiResponse } from "../utils/api-response.js";
 import { SubTask } from "../models/subtask.model.js";
@@ -51,4 +51,45 @@ export const getTaskById = asyncHandler(async (req, res) => {
     .json(
       new ApiResponse(200, { task, subtasks }, "Task fetched successfully"),
     );
+});
+
+export const updateTask = asyncHandler(async (req, res) => {
+  const { projectId, taskId } = req.params;
+  const { title, description, assignedTo, status } = req.body;
+  if (!mongoose.Types.ObjectId.isValid(taskId)) {
+    throw new ApiError(400, "Invalid Task ID");
+  }
+  if (status && !AvailableTaskStatus.includes(status)) {
+    throw new ApiError(400, "Invalid task status");
+  }
+  const task = await Task.findOneAndUpdate(
+      { _id: taskId, project: projectId },
+      {
+          $set: {
+              title,
+              description,
+              assignedTo,
+              status,
+            },
+        },
+        { new: true },
+    );
+    if (!task) {
+      throw new ApiError(404, "Task not found in this project");
+    }
+
+  return res.status(200).json(new ApiResponse(200, task, 'Task updated successfully'))
+});
+
+export const deleteTask = asyncHandler(async (req, res) => {
+  const { projectId, taskId } = req.params;
+  const task = await Task.findOneAndDelete({ _id: taskId, project: projectId });
+  if (!task) {
+    throw new ApiError(404, "Task not found");
+  }
+  await SubTask.deleteMany({ task: taskId });
+
+  return res
+    .status(200)
+    .json(new ApiResponse(200,{}, "Task deleted successfully"));
 });

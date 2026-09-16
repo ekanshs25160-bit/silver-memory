@@ -5,6 +5,9 @@ import {
   getTask,
   getTaskById,
   updateTask,
+  createSubtask,
+  updateSubtask,
+  deleteSubtask,
 } from "../controllers/task.controller.js";
 import { verifyJWT, verifyUserRole } from "../middlewares/auth.middleware.js";
 import { UserRoleEnum } from "../utils/constants.js";
@@ -31,6 +34,21 @@ router
   .delete(
     verifyUserRole([UserRoleEnum.ADMIN, UserRoleEnum.PROJECT_ADMIN]),
     deleteTask,
+  );
+
+router
+  .route("/:projectId/t/:taskId/subtasks")
+  .post(
+    verifyUserRole([UserRoleEnum.ADMIN, UserRoleEnum.PROJECT_ADMIN]),
+    createSubtask,
+  );
+
+router
+  .route("/:projectId/st/:subTaskId")
+  .put(updateSubtask)
+  .delete(
+    verifyUserRole([UserRoleEnum.ADMIN, UserRoleEnum.PROJECT_ADMIN]),
+    deleteSubtask,
   );
 
 export default router;

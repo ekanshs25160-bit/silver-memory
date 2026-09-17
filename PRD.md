@@ -62,11 +62,11 @@ Project Camp Backend is a RESTful API service designed to support collaborative 
 
 #### 3.6 Project Notes
 
-- **Note Creation:** Add notes to projects (Admin only)
-- **Note Listing:** View all project notes
-- **Note Details:** Access individual note content
-- **Note Updates:** Modify existing notes (Admin only)
-- **Note Deletion:** Remove notes (Admin only)
+- **Note Creation:** ✅ Add notes to projects (Admin only)
+- **Note Listing:** ✅ View all project notes
+- **Note Details:** ✅ Access individual note content
+- **Note Updates:** ✅ Modify existing notes (Admin only)
+- **Note Deletion:** ✅ Remove notes (Admin only)
 
 #### 3.7 System Health
 
@@ -114,11 +114,11 @@ Project Camp Backend is a RESTful API service designed to support collaborative 
 
 **Note Routes** (`/api/v1/notes/`)
 
-- `GET /:projectId` - List project notes (secured, role-based)
-- `POST /:projectId` - Create note (secured, Admin only)
-- `GET /:projectId/n/:noteId` - Get note details (secured, role-based)
-- `PUT /:projectId/n/:noteId` - Update note (secured, Admin only)
-- `DELETE /:projectId/n/:noteId` - Delete note (secured, Admin only)
+- `GET /:projectId` ✅ - List project notes (secured, role-based)
+- `POST /:projectId` ✅ - Create note (secured, Admin only)
+- `GET /:projectId/n/:noteId` ✅ - Get note details (secured, role-based)
+- `PUT /:projectId/n/:noteId` ✅ - Update note (secured, Admin only)
+- `DELETE /:projectId/n/:noteId` ✅ - Delete note (secured, Admin only)
 
 **Health Check** (`/api/v1/healthcheck/`)
 
@@ -135,8 +135,8 @@ Project Camp Backend is a RESTful API service designed to support collaborative 
 | View Tasks ✅               | ✓     | ✓             | ✓      |
 | Update Subtask Status ✅    | ✓     | ✓             | ✓      |
 | Create/Delete Subtasks ✅   | ✓     | ✓             | ✗      |
-| Create/Update/Delete Notes | ✓     | ✗             | ✗      |
-| View Notes                 | ✓     | ✓             | ✓      |
+| Create/Update/Delete Notes ✅ | ✓     | ✗             | ✗      |
+| View Notes ✅                 | ✓     | ✓             | ✓      |
 
 #### 4.3 Data Models
 

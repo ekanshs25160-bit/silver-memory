@@ -126,3 +126,4 @@ dist
 Manware-s-AI-Learning-Toolkit/
 .agents/
 learning/
+.env

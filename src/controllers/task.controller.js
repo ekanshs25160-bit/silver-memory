@@ -14,6 +14,16 @@ export const createTask = asyncHandler(async (req, res) => {
     throw new ApiError(400, "Title is needed for task");
   }
 
+  let attachments = []
+
+  if(req.files && req.files.length > 0){
+    attachments = req.files.map((file)=>({
+        url: `/images/${file.filename}`,
+        mimetype: file.mimetype,
+        size: file.size,
+    }))
+  }
+
   const task = await Task.create({
     title,
     description,
@@ -21,6 +31,7 @@ export const createTask = asyncHandler(async (req, res) => {
     assignedTo: assignedTo || null,
     status: status || TaskStatusEnum.TODO,
     createdBy: req.user._id,
+    attachments,
   });
 
   return res.status(201).json(new ApiResponse(201, task, "Task is created"));
@@ -90,7 +101,7 @@ export const deleteTask = asyncHandler(async (req, res) => {
     throw new ApiError(404, "Task not found");
   }
   await SubTask.deleteMany({ task: taskId });
-  
+
   return res
     .status(200)
     .json(new ApiResponse(200, {}, "Task deleted successfully"));

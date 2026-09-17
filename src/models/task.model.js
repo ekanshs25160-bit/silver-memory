@@ -34,6 +34,20 @@ const taskSchema = new Schema(
       ref: "User",
       required: true,
     },
+    attachments: [
+      {
+        url: {
+          type: String,
+          required: true,
+        },
+        mimetype: {
+          type: String,
+        },
+        size: {
+          type: Number,
+        },
+      },
+    ],
   },
   {
     timestamps: true,

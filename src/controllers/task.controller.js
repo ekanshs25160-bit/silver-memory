@@ -90,7 +90,7 @@ export const deleteTask = asyncHandler(async (req, res) => {
     throw new ApiError(404, "Task not found");
   }
   await SubTask.deleteMany({ task: taskId });
-
+  
   return res
     .status(200)
     .json(new ApiResponse(200, {}, "Task deleted successfully"));

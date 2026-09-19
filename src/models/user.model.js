@@ -33,6 +33,12 @@ const userSchema = new Schema(
       type: Boolean,
       default: false,
     },
+    forgotPasswordToken: {
+      type: String,
+    },
+    forgotPasswordExpiry: {
+      type: Date,
+    },
     emailVerificationToken: {
       type: String,
     },

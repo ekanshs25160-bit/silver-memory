@@ -233,3 +233,30 @@ export const resendEmailVerification = asyncHandler(async (req, res) => {
     .status(200)
     .json(new ApiResponse(200, {}, "Mail has been sent to youe email"));
 });
+
+export const forgotPasswordRequest = asyncHandler(async (req, res) => {
+  const { email } = req.body;
+  const user = await User.findOne({ email });
+
+  if (!user) {
+    throw new ApiError(404, "User does not exists", []);
+  }
+
+  const { unHashedToken, hashedToken, tokenExpiry } =
+    user.generateTemporaryToken();
+
+  user.forgotPasswordToken = hashedToken;
+  user.forgotPasswordExpiry = tokenExpiry;
+
+  await user.save({ validateBeforeSave: false });
+  return (
+    res.status(200).
+    json(
+      new ApiResponse(
+        200,
+        {},
+        "Password reset mail has been sent to your provided email",
+      ),
+    )
+  );
+});

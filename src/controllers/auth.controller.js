@@ -3,6 +3,11 @@ import { User } from "../models/user.model.js";
 import { ApiError } from "../utils/api-error.js";
 import { ApiResponse } from "../utils/api-response.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
+import {
+  sendEmail,
+  emailVerificationMailgenContent,
+  forgotPasswordMailgenContent,
+} from "../utils/mail.js";
 import jwt from "jsonwebtoken";
 
 const generateAccessAndRefreshToken = async (userId) => {
@@ -43,14 +48,14 @@ export const registerUser = asyncHandler(async (req, res) => {
 
   await user.save({ validateBeforeSave: false });
 
-  // await sendEmail({
-  //   email: user?.email,
-  //   subject: "Please verify your email",
-  //   mailgenContent: emailVerificationMailgenContent(
-  //     user.username,
-  //     `${req.protocol}://${req.get("host")}/api/v1/users/verify-email/${unHashedToken}`,
-  //   ),
-  // });
+  await sendEmail({
+    email: user?.email,
+    subject: "Please verify your email",
+    mailgenContent: emailVerificationMailgenContent(
+      user.username,
+      `${req.protocol}://${req.get("host")}/api/v1/auth/verify-email/${unHashedToken}`,
+    ),
+  });
 
   const createUser = await User.findById(user._id).select(
     "-password -refreshToken -emailVerificationToken -emailVerificationExpiry",
@@ -229,6 +234,15 @@ export const resendEmailVerification = asyncHandler(async (req, res) => {
   user.emailVerificationToken = hashedToken;
   user.emailVerificationExpiry = tokenExpiry;
   await user.save({ validateBeforeSave: false });
+  await sendEmail({
+  email: user?.email,
+  subject: "Please verify your email",
+  mailgenContent: emailVerificationMailgenContent(
+    user.username,
+    `${req.protocol}://${req.get("host")}/api/v1/auth/verify-email/${unHashedToken}`
+  ),
+});
+
   return res
     .status(200)
     .json(new ApiResponse(200, {}, "Mail has been sent to youe email"));
@@ -249,6 +263,16 @@ export const forgotPasswordRequest = asyncHandler(async (req, res) => {
   user.forgotPasswordExpiry = tokenExpiry;
 
   await user.save({ validateBeforeSave: false });
+
+  await sendEmail({
+  email: user?.email,
+  subject: "Reset your password",
+  mailgenContent: forgotPasswordMailgenContent(
+    user.username,
+    `${req.protocol}://${req.get("host")}/api/v1/auth/reset-password/${unHashedToken}`
+  ),
+});
+
   return res
     .status(200)
     .json(

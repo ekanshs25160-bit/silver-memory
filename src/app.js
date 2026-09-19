@@ -4,7 +4,7 @@ import { healthCheck } from './controllers/healthCheck.controllers.js'
 import projectRouter from './routes/project.routes.js'
 import authRouter from './routes/auth.routes.js'
 import taskRouter from './routes/task.routes.js'
-import notesRouter from '/routes/notes.routes.js'
+import notesRouter from './routes/notes.routes.js'
 
 
 const app = express()

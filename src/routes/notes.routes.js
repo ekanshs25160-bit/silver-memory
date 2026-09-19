@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { verifyJWT, verifyUserRole } from "../middlewares/auth.middleware.j";
+import { verifyJWT, verifyUserRole } from "../middlewares/auth.middleware.js";
 import { UserRoleEnum } from "../utils/constants.js";
 import {
   createNote,
@@ -7,7 +7,7 @@ import {
   deleteNote,
   getNotes,
   getNoteById,
-} from "../controllers/note.controller";
+} from "../controllers/note.controller.js";
 
 const router = Router();
 

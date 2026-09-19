@@ -1,7 +1,5 @@
 import mongoose from "mongoose";
 import { Schema } from "mongoose";
-import { Task } from "./task.model";
-import { User } from "./user.model";
 
 const subTaskSchema = new Schema(
   {

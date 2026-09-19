@@ -33,11 +33,42 @@ export const registerUser = asyncHandler(async (req, res) => {
     email,
     username,
     password,
+    isEmailVerified: false,
   });
-  const createUser = await User.findById(user._id).select("-password");
+  const { unHashedToken, hashedToken, tokenExpiry } =
+    user.generateTemporaryToken();
+
+  user.emailVerificationToken = hashedToken;
+  user.emailVerificationExpiry = tokenExpiry;
+
+  await user.save({ validateBeforeSave: false });
+
+  // await sendEmail({
+  //   email: user?.email,
+  //   subject: "Please verify your email",
+  //   mailgenContent: emailVerificationMailgenContent(
+  //     user.username,
+  //     `${req.protocol}://${req.get("host")}/api/v1/users/verify-email/${unHashedToken}`,
+  //   ),
+  // });
+
+  const createUser = await User.findById(user._id).select(
+    "-password -refreshToken -emailVerificationToken -emailVerificationExpiry",
+  );
+
+  if (!createUser) {
+    throw new ApiError(500, "Something went wrong while registering a user");
+  }
+
   return res
     .status(201)
-    .json(new ApiResponse(201, createUser, "User registered successfully"));
+    .json(
+      new ApiResponse(
+        201,
+        { user: createUser, unHashedToken },
+        "User registered successfully and verification email has been sent on your email",
+      ),
+    );
 });
 
 export const loginUser = asyncHandler(async (req, res) => {
@@ -188,6 +219,17 @@ export const verifyEmail = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, {}, "Email verified successfully"));
 });
 
-export const resendEmailVerification = asyncHandler(async(req,res)=>{
-  
-})
+export const resendEmailVerification = asyncHandler(async (req, res) => {
+  const user = await User.findById(req.user?._id);
+  if (user.isEmailVerified) {
+    throw new ApiError(400, "User is already verified");
+  }
+  const { unHashedToken, hashedToken, tokenExpiry } =
+    user.generateTemporaryToken();
+  user.emailVerificationToken = hashedToken;
+  user.emailVerificationExpiry = tokenExpiry;
+  await user.save({ validateBeforeSave: false });
+  return res
+    .status(200)
+    .json(new ApiResponse(200, {}, "Mail has been sent to youe email"));
+});

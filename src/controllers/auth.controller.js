@@ -1,10 +1,9 @@
-import { Project } from "../models/project.model.js";
+import crypto from "crypto";
 import { User } from "../models/user.model.js";
 import { ApiError } from "../utils/api-error.js";
 import { ApiResponse } from "../utils/api-response.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import jwt from "jsonwebtoken";
-import mongoose from "mongoose";
 
 const generateAccessAndRefreshToken = async (userId) => {
   try {
@@ -157,6 +156,38 @@ export const refreshAccessToken = asyncHandler(async (req, res) => {
         ),
       );
   } catch (err) {
-    throw new ApiError(401,'Invalid refresh token')
+    throw new ApiError(401, "Invalid refresh token");
   }
 });
+
+export const verifyEmail = asyncHandler(async (req, res) => {
+  const { verificationToken } = req.params;
+
+  if (!verificationToken) {
+    throw new ApiError(400, "Email verification token is missing");
+  }
+
+  const hashedToken = crypto
+    .createHash("sha256")
+    .update(verificationToken)
+    .digest("hex");
+
+  const user = await User.findOne({
+    emailVerificationToken: hashedToken,
+    emailVerificationExpiry: { $gt: Date.now() },
+  });
+  if (!user) {
+    throw new ApiError(400, "Token is invalid");
+  }
+  user.isEmailVerified = true;
+  user.emailVerificationExpiry = undefined;
+  user.emailVerificationToken = undefined;
+  await user.save({ validateBeforeSave: false });
+  return res
+    .status(200)
+    .json(new ApiResponse(200, {}, "Email verified successfully"));
+});
+
+export const resendEmailVerification = asyncHandler(async(req,res)=>{
+  
+})
